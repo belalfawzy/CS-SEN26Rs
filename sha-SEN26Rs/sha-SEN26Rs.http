@@ -1,0 +1,6 @@
+@sha_SEN26Rs_HostAddress = http://localhost:5027
+
+GET {{sha_SEN26Rs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
