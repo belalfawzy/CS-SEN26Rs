@@ -12,12 +12,13 @@ public class OnboardingDto
     [StringLength(500)]
     public string? Bio { get; set; }
 
-    public string? AvatarUrl { get; set; }
     public string? Phone { get; set; }
     public string? Location { get; set; }
     public string? Website { get; set; }
     public string? GraduationProjectSpecialty { get; set; }
-    public List<long> SpecialtyIds { get; set; } = [];
+    [AllowedValues("public", "students_only", "private")]
+    public string PrivacySetting { get; set; } = "public";
+    public int? TeamNumber { get; set; }
     public List<SocialLinkInputDto> SocialLinks { get; set; } = [];
 }
 

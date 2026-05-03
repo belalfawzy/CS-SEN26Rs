@@ -1,6 +1,7 @@
 using sha_SEN26Rs.DTOs.Students;
 using sha_SEN26Rs.Models;
 using sha_SEN26Rs.Repositories;
+using System.Text.RegularExpressions;
 
 namespace sha_SEN26Rs.Services;
 
@@ -21,7 +22,7 @@ public interface IStudentService
 
 public class StudentService(
     IStudentRepository studentRepo,
-    ISpecialtyRepository specialtyRepo) : IStudentService
+    ITeamRepository teamRepo) : IStudentService
 {
     public async Task<List<StudentResponseDto>> GetAllAsync()
     {
@@ -71,33 +72,40 @@ public class StudentService(
         student.FullName = dto.FullName;
         student.Nickname = dto.Nickname;
         student.Bio = dto.Bio;
-        student.AvatarUrl = dto.AvatarUrl;
         student.Phone = dto.Phone;
         student.Location = dto.Location;
         student.Website = dto.Website;
         student.GraduationProjectSpecialty = dto.GraduationProjectSpecialty;
+        student.PrivacySetting = dto.PrivacySetting;
         student.IsOnboarded = true;
 
-        if (dto.SpecialtyIds.Count > 0)
+        var baseUsername = Regex.Replace(
+            (dto.Nickname ?? dto.FullName).ToLower().Trim(), @"[^a-z0-9]+", "_").Trim('_');
+        var username = baseUsername;
+        var counter = 2;
+        while (await studentRepo.UsernameExistsAsync(username) &&
+               (await studentRepo.GetByUsernameAsync(username))?.Id != student.Id)
+            username = $"{baseUsername}_{counter++}";
+        student.Username = username;
+
+        if (dto.TeamNumber.HasValue)
         {
-            var specialties = await specialtyRepo.GetByIdsAsync(dto.SpecialtyIds);
-            student.StudentSpecialties = specialties.Select(sp => new StudentSpecialty
-            {
-                StudentId = student.Id,
-                SpecialtyId = sp.Id
-            }).ToList();
+            var team = await teamRepo.GetByNumberAsync(dto.TeamNumber.Value)
+                ?? await teamRepo.CreateAsync(new Team
+                {
+                    Name = $"Team {dto.TeamNumber.Value}",
+                    TeamNumber = dto.TeamNumber.Value
+                });
+            student.TeamId = team.Id;
         }
 
-        if (dto.SocialLinks.Count > 0)
+        student.SocialLinks = dto.SocialLinks.Select(l => new SocialLink
         {
-            student.SocialLinks = dto.SocialLinks.Select(l => new SocialLink
-            {
-                StudentId = student.Id,
-                Platform = l.Platform,
-                Url = l.Url,
-                CreatedAt = DateTime.UtcNow
-            }).ToList();
-        }
+            StudentId = student.Id,
+            Platform = l.Platform,
+            Url = l.Url,
+            CreatedAt = DateTime.UtcNow
+        }).ToList();
 
         var updated = await studentRepo.UpdateAsync(student);
         return AuthService.MapToDto(updated);

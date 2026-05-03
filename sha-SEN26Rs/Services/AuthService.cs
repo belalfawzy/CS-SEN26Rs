@@ -19,16 +19,24 @@ public class AuthService(IStudentRepository studentRepo, IConfiguration config) 
 {
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
     {
-        if (await studentRepo.UsernameExistsAsync(dto.Username))
-            throw new InvalidOperationException("Username already taken.");
-
         if (await studentRepo.EmailExistsAsync(dto.Email))
             throw new InvalidOperationException("Email already registered.");
 
+        var baseUsername = dto.Email.Split('@')[0]
+            .ToLower()
+            .Replace(".", "_")
+            .Replace("-", "_")
+            .Replace("+", "_");
+
+        var username = baseUsername;
+        var counter = 2;
+        while (await studentRepo.UsernameExistsAsync(username))
+            username = $"{baseUsername}_{counter++}";
+
         var student = new Student
         {
-            FullName = dto.FullName,
-            Username = dto.Username,
+            FullName = "New User",
+            Username = username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
         };
@@ -39,11 +47,11 @@ public class AuthService(IStudentRepository studentRepo, IConfiguration config) 
 
     public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
     {
-        var student = await studentRepo.GetByUsernameAsync(dto.Username)
-            ?? throw new UnauthorizedAccessException("Invalid username or password.");
+        var student = await studentRepo.GetByEmailAsync(dto.Email)
+            ?? throw new UnauthorizedAccessException("Invalid email or password.");
 
         if (!BCrypt.Net.BCrypt.Verify(dto.Password, student.PasswordHash))
-            throw new UnauthorizedAccessException("Invalid username or password.");
+            throw new UnauthorizedAccessException("Invalid email or password.");
 
         return new AuthResponseDto { Token = GenerateToken(student), Student = MapToDto(student) };
     }

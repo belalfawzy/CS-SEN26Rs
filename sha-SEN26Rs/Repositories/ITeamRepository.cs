@@ -10,4 +10,5 @@ public interface ITeamRepository
     Task<Team> UpdateAsync(Team team);
     Task DeleteAsync(Team team);
     Task<bool> TeamNumberExistsAsync(int teamNumber);
+    Task<Team?> GetByNumberAsync(int teamNumber);
 }

@@ -41,4 +41,9 @@ public class TeamRepository(AppDbContext context) : ITeamRepository
 
     public async Task<bool> TeamNumberExistsAsync(int teamNumber) =>
         await context.Teams.AnyAsync(t => t.TeamNumber == teamNumber);
+
+    public async Task<Team?> GetByNumberAsync(int teamNumber) =>
+        await context.Teams
+            .Include(t => t.Members)
+            .FirstOrDefaultAsync(t => t.TeamNumber == teamNumber);
 }

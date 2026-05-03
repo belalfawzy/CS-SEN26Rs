@@ -91,11 +91,12 @@ try
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+    await DataSeeder.SeedAsync(db);
 }
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "Database migration failed on startup.");
+    logger.LogError(ex, "Database migration/seeding failed on startup.");
 }
 
 app.UseExceptionHandler(errorApp =>
