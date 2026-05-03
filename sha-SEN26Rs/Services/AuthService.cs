@@ -2,7 +2,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using sha_SEN26Rs.DTOs;
+using sha_SEN26Rs.DTOs.Auth;
+using sha_SEN26Rs.DTOs.Students;
 using sha_SEN26Rs.Models;
 using sha_SEN26Rs.Repositories;
 
@@ -14,94 +15,82 @@ public interface IAuthService
     Task<AuthResponseDto> LoginAsync(LoginDto dto);
 }
 
-public class AuthService : IAuthService
+public class AuthService(IStudentRepository studentRepo, IConfiguration config) : IAuthService
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IConfiguration _configuration;
-
-    public AuthService(IUserRepository userRepository, IConfiguration configuration)
-    {
-        _userRepository = userRepository;
-        _configuration = configuration;
-    }
-
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
     {
-        if (await _userRepository.UsernameExistsAsync(dto.Username))
-            throw new InvalidOperationException("Username is already taken.");
+        if (await studentRepo.UsernameExistsAsync(dto.Username))
+            throw new InvalidOperationException("Username already taken.");
 
-        if (await _userRepository.EmailExistsAsync(dto.Email))
-            throw new InvalidOperationException("Email is already registered.");
+        if (await studentRepo.EmailExistsAsync(dto.Email))
+            throw new InvalidOperationException("Email already registered.");
 
-        var user = new User
+        var student = new Student
         {
-            Name = dto.Name,
+            FullName = dto.FullName,
             Username = dto.Username,
             Email = dto.Email,
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password)
         };
 
-        await _userRepository.CreateAsync(user);
-
-        var token = GenerateJwtToken(user);
-
-        return new AuthResponseDto
-        {
-            Token = token,
-            User = MapToDto(user)
-        };
+        var created = await studentRepo.CreateAsync(student);
+        return new AuthResponseDto { Token = GenerateToken(created), Student = MapToDto(created) };
     }
 
     public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
     {
-        var user = await _userRepository.GetByUsernameAsync(dto.Username)
+        var student = await studentRepo.GetByUsernameAsync(dto.Username)
             ?? throw new UnauthorizedAccessException("Invalid username or password.");
 
-        if (!BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
+        if (!BCrypt.Net.BCrypt.Verify(dto.Password, student.PasswordHash))
             throw new UnauthorizedAccessException("Invalid username or password.");
 
-        var token = GenerateJwtToken(user);
-
-        return new AuthResponseDto
-        {
-            Token = token,
-            User = MapToDto(user)
-        };
+        return new AuthResponseDto { Token = GenerateToken(student), Student = MapToDto(student) };
     }
 
-    private string GenerateJwtToken(User user)
+    private string GenerateToken(Student student)
     {
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Name, user.Username),
-            new Claim(ClaimTypes.Email, user.Email)
+            new Claim(ClaimTypes.NameIdentifier, student.Id.ToString()),
+            new Claim(ClaimTypes.Name, student.Username),
+            new Claim(ClaimTypes.Email, student.Email)
         };
 
         var token = new JwtSecurityToken(
-            issuer: _configuration["Jwt:Issuer"],
-            audience: _configuration["Jwt:Audience"],
+            issuer: config["Jwt:Issuer"],
+            audience: config["Jwt:Audience"],
             claims: claims,
             expires: DateTime.UtcNow.AddDays(7),
-            signingCredentials: credentials
-        );
+            signingCredentials: creds);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private static UserResponseDto MapToDto(User user)
+    internal static StudentResponseDto MapToDto(Student s) => new()
     {
-        return new UserResponseDto
-        {
-            Id = user.Id,
-            Name = user.Name,
-            Username = user.Username,
-            Email = user.Email,
-            CreatedAt = user.CreatedAt
-        };
-    }
+        Id = s.Id,
+        Username = s.Username,
+        FullName = s.FullName,
+        Nickname = s.Nickname,
+        Email = s.Email,
+        Bio = s.Bio,
+        AvatarUrl = s.AvatarUrl,
+        CoverUrl = s.CoverUrl,
+        GraduationYear = s.GraduationYear,
+        GraduationProjectSpecialty = s.GraduationProjectSpecialty,
+        IsOnboarded = s.IsOnboarded,
+        Phone = s.Phone,
+        Location = s.Location,
+        Website = s.Website,
+        PrivacySetting = s.PrivacySetting,
+        TeamId = s.TeamId,
+        TeamName = s.Team?.Name,
+        Specialties = s.StudentSpecialties.Select(ss => ss.Specialty.Name).ToList(),
+        SocialLinks = s.SocialLinks.Select(l => new SocialLinkDto { Id = l.Id, Platform = l.Platform, Url = l.Url }).ToList(),
+        CreatedAt = s.CreatedAt
+    };
 }

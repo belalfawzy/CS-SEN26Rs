@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace sha_SEN26Rs.DTOs;
+namespace sha_SEN26Rs.DTOs.Auth;
 
 public class LoginDto
 {

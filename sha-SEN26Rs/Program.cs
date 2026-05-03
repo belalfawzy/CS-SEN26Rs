@@ -9,7 +9,6 @@ using sha_SEN26Rs.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// DbContext with transient fault handling
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -18,16 +17,22 @@ builder.Services.AddDbContext<AppDbContext>(options =>
             maxRetryDelay: TimeSpan.FromSeconds(10),
             errorNumbersToAdd: null)));
 
-// Repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+builder.Services.AddScoped<ITeamRepository, TeamRepository>();
+builder.Services.AddScoped<IMemoryBoardRepository, MemoryBoardRepository>();
+builder.Services.AddScoped<ISpecialtyRepository, SpecialtyRepository>();
+builder.Services.AddScoped<IUserImageRepository, UserImageRepository>();
 
-// Services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IStudentService, StudentService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
+builder.Services.AddScoped<ITeamService, TeamService>();
+builder.Services.AddScoped<IMemoryBoardService, MemoryBoardService>();
+builder.Services.AddScoped<ISpecialtyService, SpecialtyService>();
+builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+builder.Services.AddScoped<IUserImageService, UserImageService>();
 
-// JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -51,7 +56,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
-// Swagger with JWT support
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -82,7 +86,6 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Auto-migrate database on startup (safe for shared hosting)
 try
 {
     using var scope = app.Services.CreateScope();
@@ -92,10 +95,9 @@ try
 catch (Exception ex)
 {
     var logger = app.Services.GetRequiredService<ILogger<Program>>();
-    logger.LogError(ex, "Database migration failed on startup. The app will continue without migration.");
+    logger.LogError(ex, "Database migration failed on startup.");
 }
 
-// Global exception handler
 app.UseExceptionHandler(errorApp =>
 {
     errorApp.Run(async context =>
@@ -109,7 +111,6 @@ app.UseExceptionHandler(errorApp =>
     });
 });
 
-// Swagger UI
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {

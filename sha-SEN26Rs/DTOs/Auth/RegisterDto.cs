@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace sha_SEN26Rs.DTOs;
+namespace sha_SEN26Rs.DTOs.Auth;
 
 public class RegisterDto
 {
     [Required]
     [StringLength(100, MinimumLength = 2)]
-    public string Name { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
 
     [Required]
     [StringLength(50, MinimumLength = 3)]

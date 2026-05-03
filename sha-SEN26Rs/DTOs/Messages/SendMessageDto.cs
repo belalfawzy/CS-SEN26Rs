@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace sha_SEN26Rs.DTOs;
+namespace sha_SEN26Rs.DTOs.Messages;
 
 public class SendMessageDto
 {
@@ -11,5 +11,5 @@ public class SendMessageDto
     [Required]
     public Guid ReceiverId { get; set; }
 
-    public bool IsAnonymous { get; set; }
+    public bool IsAnonymous { get; set; } = false;
 }

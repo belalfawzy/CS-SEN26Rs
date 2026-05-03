@@ -4,60 +4,47 @@ using sha_SEN26Rs.Models;
 
 namespace sha_SEN26Rs.Repositories;
 
-public class MessageRepository : IMessageRepository
+public class MessageRepository(AppDbContext context) : IMessageRepository
 {
-    private readonly AppDbContext _context;
-
-    public MessageRepository(AppDbContext context)
-    {
-        _context = context;
-    }
-
-    public async Task<Message?> GetByIdAsync(Guid id)
-    {
-        return await _context.Messages
+    public async Task<Message?> GetByIdAsync(Guid id) =>
+        await context.Messages
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
             .FirstOrDefaultAsync(m => m.Id == id);
-    }
 
-    public async Task<List<Message>> GetReceivedMessagesAsync(Guid userId)
-    {
-        return await _context.Messages
+    public async Task<List<Message>> GetReceivedMessagesAsync(Guid studentId) =>
+        await context.Messages
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
-            .Where(m => m.ReceiverId == userId)
+            .Where(m => m.ReceiverId == studentId)
             .OrderByDescending(m => m.CreatedAt)
             .ToListAsync();
-    }
 
-    public async Task<List<Message>> GetSentMessagesAsync(Guid userId)
-    {
-        return await _context.Messages
+    public async Task<List<Message>> GetSentMessagesAsync(Guid studentId) =>
+        await context.Messages
             .Include(m => m.Sender)
             .Include(m => m.Receiver)
-            .Where(m => m.SenderId == userId)
+            .Where(m => m.SenderId == studentId)
             .OrderByDescending(m => m.CreatedAt)
             .ToListAsync();
-    }
 
     public async Task<Message> CreateAsync(Message message)
     {
-        _context.Messages.Add(message);
-        await _context.SaveChangesAsync();
+        context.Messages.Add(message);
+        await context.SaveChangesAsync();
         return message;
     }
 
     public async Task<Message> UpdateAsync(Message message)
     {
-        _context.Messages.Update(message);
-        await _context.SaveChangesAsync();
+        context.Messages.Update(message);
+        await context.SaveChangesAsync();
         return message;
     }
 
     public async Task DeleteAsync(Message message)
     {
-        _context.Messages.Remove(message);
-        await _context.SaveChangesAsync();
+        context.Messages.Remove(message);
+        await context.SaveChangesAsync();
     }
 }

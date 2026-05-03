@@ -10,6 +10,6 @@ public class Message
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? UpdatedAt { get; set; }
 
-    public User? Sender { get; set; }
-    public User Receiver { get; set; } = null!;
+    public Student? Sender { get; set; }
+    public Student Receiver { get; set; } = null!;
 }
