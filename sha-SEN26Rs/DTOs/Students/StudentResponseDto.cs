@@ -21,6 +21,7 @@ public class StudentResponseDto
     public string? TeamName { get; set; }
     public List<string> Specialties { get; set; } = [];
     public List<SocialLinkDto> SocialLinks { get; set; } = [];
+    public int ImageCount { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 

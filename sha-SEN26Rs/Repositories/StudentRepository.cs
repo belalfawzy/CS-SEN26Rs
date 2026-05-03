@@ -11,6 +11,7 @@ public class StudentRepository(AppDbContext context) : IStudentRepository
             .Include(s => s.Team)
             .Include(s => s.StudentSpecialties).ThenInclude(ss => ss.Specialty)
             .Include(s => s.SocialLinks)
+            .Include(s => s.Images)
             .FirstOrDefaultAsync(s => s.Id == id);
 
     public async Task<Student?> GetByUsernameAsync(string username) =>
@@ -18,6 +19,7 @@ public class StudentRepository(AppDbContext context) : IStudentRepository
             .Include(s => s.Team)
             .Include(s => s.StudentSpecialties).ThenInclude(ss => ss.Specialty)
             .Include(s => s.SocialLinks)
+            .Include(s => s.Images)
             .FirstOrDefaultAsync(s => s.Username == username);
 
     public async Task<Student?> GetByEmailAsync(string email) =>

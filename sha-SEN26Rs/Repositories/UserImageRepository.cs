@@ -12,6 +12,20 @@ public class UserImageRepository(AppDbContext context) : IUserImageRepository
             .OrderByDescending(i => i.CreatedAt)
             .ToListAsync();
 
+    public async Task<List<UserImage>> GetPublicAllAsync() =>
+        await context.UserImages
+            .Where(i => i.IsPublic)
+            .Include(i => i.Student)
+            .OrderByDescending(i => i.CreatedAt)
+            .ToListAsync();
+
+    public async Task<List<UserImage>> GetPublicByStudentIdAsync(Guid studentId) =>
+        await context.UserImages
+            .Where(i => i.StudentId == studentId && i.IsPublic)
+            .Include(i => i.Student)
+            .OrderByDescending(i => i.CreatedAt)
+            .ToListAsync();
+
     public async Task<UserImage?> GetByIdAsync(Guid id) =>
         await context.UserImages.FindAsync(id);
 

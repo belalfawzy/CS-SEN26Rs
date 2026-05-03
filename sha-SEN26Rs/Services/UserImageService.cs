@@ -7,6 +7,8 @@ public interface IUserImageService
 {
     Task<UserImageDto> UploadAsync(Guid studentId, IFormFile file, string? caption, bool isPublic);
     Task<List<UserImageDto>> GetMyImagesAsync(Guid studentId);
+    Task<List<CommunityImageDto>> GetCommunityImagesAsync();
+    Task<List<CommunityImageDto>> GetPublicByStudentIdAsync(Guid studentId);
     Task DeleteAsync(Guid imageId, Guid studentId);
 }
 
@@ -17,6 +19,19 @@ public record UserImageDto(
     string? Caption,
     bool IsPublic,
     DateTime CreatedAt);
+
+public record CommunityImageDto(
+    Guid Id,
+    string Url,
+    string? Caption,
+    DateTime CreatedAt,
+    ImageUploaderDto Uploader);
+
+public record ImageUploaderDto(
+    Guid Id,
+    string FullName,
+    string Username,
+    string? AvatarUrl);
 
 public class UserImageService(
     IUserImageRepository imageRepo,
@@ -71,6 +86,22 @@ public class UserImageService(
         await imageRepo.DeleteAsync(image);
     }
 
+    public async Task<List<CommunityImageDto>> GetCommunityImagesAsync()
+    {
+        var images = await imageRepo.GetPublicAllAsync();
+        return images.Select(MapToCommunityDto).ToList();
+    }
+
+    public async Task<List<CommunityImageDto>> GetPublicByStudentIdAsync(Guid studentId)
+    {
+        var images = await imageRepo.GetPublicByStudentIdAsync(studentId);
+        return images.Select(MapToCommunityDto).ToList();
+    }
+
     private static UserImageDto MapToDto(UserImage i) =>
         new(i.Id, i.Url, i.FileName, i.Caption, i.IsPublic, i.CreatedAt);
+
+    private static CommunityImageDto MapToCommunityDto(UserImage i) =>
+        new(i.Id, i.Url, i.Caption, i.CreatedAt,
+            new ImageUploaderDto(i.Student.Id, i.Student.FullName, i.Student.Username, i.Student.AvatarUrl));
 }

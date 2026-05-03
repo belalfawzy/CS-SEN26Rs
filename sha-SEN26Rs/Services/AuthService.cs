@@ -99,6 +99,7 @@ public class AuthService(IStudentRepository studentRepo, IConfiguration config) 
         TeamName = s.Team?.Name,
         Specialties = s.StudentSpecialties.Select(ss => ss.Specialty.Name).ToList(),
         SocialLinks = s.SocialLinks.Select(l => new SocialLinkDto { Id = l.Id, Platform = l.Platform, Url = l.Url }).ToList(),
+        ImageCount = s.Images.Count,
         CreatedAt = s.CreatedAt
     };
 }

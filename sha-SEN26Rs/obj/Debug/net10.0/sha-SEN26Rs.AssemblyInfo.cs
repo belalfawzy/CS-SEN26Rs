@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("sha-SEN26Rs")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b68af021e4d0e18115db832d84b6ebc0643049d2")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+79b813dd310b0fc0807843631f1c21a5d8534f8c")]
 [assembly: System.Reflection.AssemblyProductAttribute("sha-SEN26Rs")]
 [assembly: System.Reflection.AssemblyTitleAttribute("sha-SEN26Rs")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

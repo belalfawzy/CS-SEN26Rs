@@ -9,7 +9,7 @@ namespace sha_SEN26Rs.Controllers;
 [ApiController]
 [Route("api/students")]
 [Authorize]
-public class StudentsController(IStudentService studentService) : ControllerBase
+public class StudentsController(IStudentService studentService, IUserImageService imageService) : ControllerBase
 {
     private Guid CurrentStudentId =>
         Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
@@ -22,6 +22,17 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     public async Task<IActionResult> GetByUsername(string username)
     {
         try { return Ok(await studentService.GetByUsernameAsync(username)); }
+        catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+    }
+
+    [HttpGet("{username}/images")]
+    public async Task<IActionResult> GetStudentImages(string username)
+    {
+        try
+        {
+            var student = await studentService.GetByUsernameAsync(username);
+            return Ok(await imageService.GetPublicByStudentIdAsync(student.Id));
+        }
         catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
     }
 

@@ -32,6 +32,10 @@ public class ImagesController(IUserImageService imageService) : ControllerBase
     public async Task<IActionResult> GetMyImages() =>
         Ok(await imageService.GetMyImagesAsync(CurrentStudentId));
 
+    [HttpGet("community")]
+    public async Task<IActionResult> GetCommunity() =>
+        Ok(await imageService.GetCommunityImagesAsync());
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(Guid id)
     {
