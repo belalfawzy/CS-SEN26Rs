@@ -62,7 +62,15 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "SHA SEN26RS API",
         Version = "v1",
-        Description = "A REST API for CS El Shorouk SEN26Rs"
+        Description = """
+            **Auth in 10 seconds:**
+            1. Call `POST /api/auth/login` → copy the `token`.
+            2. Click **Authorize** (top-right lock) → paste: `Bearer <token>`.
+            3. Done. All endpoints work now.
+
+            Only `register` and `login` work without a token. Token lives for 7 days.
+            All bodies are JSON, except `POST /api/images` (multipart/form-data).
+            """
     });
 
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -72,7 +80,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter your JWT token"
+        Description = "Paste your JWT token here. Write it like: Bearer <your token>"
     });
 
     options.AddSecurityRequirement(doc =>
@@ -82,6 +90,10 @@ builder.Services.AddSwaggerGen(options =>
         requirement.Add(schemeRef, new List<string>());
         return requirement;
     });
+
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
