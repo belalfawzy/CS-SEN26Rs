@@ -49,16 +49,72 @@ public class StudentService(
         var student = await studentRepo.GetByIdAsync(studentId)
             ?? throw new KeyNotFoundException("Student not found.");
 
-        if (dto.FullName is not null) student.FullName = dto.FullName;
-        if (dto.Nickname is not null) student.Nickname = dto.Nickname;
-        if (dto.Bio is not null) student.Bio = dto.Bio;
-        if (dto.AvatarUrl is not null) student.AvatarUrl = dto.AvatarUrl;
-        if (dto.CoverUrl is not null) student.CoverUrl = dto.CoverUrl;
-        if (dto.Phone is not null) student.Phone = dto.Phone;
-        if (dto.Location is not null) student.Location = dto.Location;
-        if (dto.Website is not null) student.Website = dto.Website;
-        if (dto.GraduationProjectSpecialty is not null) student.GraduationProjectSpecialty = dto.GraduationProjectSpecialty;
-        if (dto.PrivacySetting is not null) student.PrivacySetting = dto.PrivacySetting;
+        bool changed = false;
+
+        if (dto.FullName is not null && dto.FullName != student.FullName)
+            { student.FullName = dto.FullName; changed = true; }
+
+        if (dto.Nickname is not null && dto.Nickname != student.Nickname)
+            { student.Nickname = dto.Nickname; changed = true; }
+
+        if (dto.Bio is not null && dto.Bio != student.Bio)
+            { student.Bio = string.IsNullOrWhiteSpace(dto.Bio) ? null : dto.Bio; changed = true; }
+
+        if (dto.AvatarUrl is not null && dto.AvatarUrl != student.AvatarUrl)
+            { student.AvatarUrl = dto.AvatarUrl; changed = true; }
+
+        if (dto.CoverUrl is not null && dto.CoverUrl != student.CoverUrl)
+            { student.CoverUrl = dto.CoverUrl; changed = true; }
+
+        if (dto.Phone is not null && dto.Phone != student.Phone)
+            { student.Phone = string.IsNullOrWhiteSpace(dto.Phone) ? null : dto.Phone; changed = true; }
+
+        if (dto.Location is not null && dto.Location != student.Location)
+            { student.Location = string.IsNullOrWhiteSpace(dto.Location) ? null : dto.Location; changed = true; }
+
+        if (dto.Website is not null && dto.Website != student.Website)
+            { student.Website = string.IsNullOrWhiteSpace(dto.Website) ? null : dto.Website; changed = true; }
+
+        if (dto.GraduationProjectSpecialty is not null && dto.GraduationProjectSpecialty != student.GraduationProjectSpecialty)
+            { student.GraduationProjectSpecialty = dto.GraduationProjectSpecialty; changed = true; }
+
+        if (dto.PrivacySetting is not null && dto.PrivacySetting != student.PrivacySetting)
+            { student.PrivacySetting = dto.PrivacySetting; changed = true; }
+
+        if (dto.TeamNumber.HasValue && student.Team?.TeamNumber != dto.TeamNumber.Value)
+        {
+            var team = await teamRepo.GetByNumberAsync(dto.TeamNumber.Value)
+                ?? await teamRepo.CreateAsync(new Team
+                {
+                    Name = $"Team {dto.TeamNumber.Value}",
+                    TeamNumber = dto.TeamNumber.Value
+                });
+            student.TeamId = team.Id;
+            changed = true;
+        }
+
+        if (dto.SocialLinks is not null)
+        {
+            var currentSet = student.SocialLinks
+                .Select(l => $"{l.Platform.ToLower()}|{l.Url}").ToHashSet();
+            var newSet = dto.SocialLinks
+                .Select(l => $"{l.Platform.ToLower()}|{l.Url}").ToHashSet();
+
+            if (!currentSet.SetEquals(newSet))
+            {
+                student.SocialLinks = dto.SocialLinks.Select(l => new SocialLink
+                {
+                    StudentId = student.Id,
+                    Platform = l.Platform,
+                    Url = l.Url,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+                changed = true;
+            }
+        }
+
+        if (!changed)
+            throw new InvalidOperationException("No changes detected.");
 
         var updated = await studentRepo.UpdateAsync(student);
         return AuthService.MapToDto(updated);

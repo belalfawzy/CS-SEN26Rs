@@ -18,6 +18,10 @@ public class UpdateStudentDto
     public string? Location { get; set; }
     public string? Website { get; set; }
     public string? GraduationProjectSpecialty { get; set; }
+
     [AllowedValues("public", "students_only", "private")]
     public string? PrivacySetting { get; set; }
+
+    public int? TeamNumber { get; set; }
+    public List<SocialLinkInputDto>? SocialLinks { get; set; }
 }

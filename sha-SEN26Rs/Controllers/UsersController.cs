@@ -37,6 +37,7 @@ public class StudentsController(IStudentService studentService) : ControllerBase
     {
         try { return Ok(await studentService.UpdateAsync(CurrentStudentId, dto)); }
         catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
     }
 
     [HttpPost("me/onboarding")]
