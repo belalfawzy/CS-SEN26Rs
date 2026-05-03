@@ -7,6 +7,7 @@ D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\sha-SEN26Rs.pdb
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Azure.Core.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Azure.Identity.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\BCrypt.Net-Next.dll
+D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\CloudinaryDotNet.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.AspNetCore.OpenApi.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.Bcl.AsyncInterfaces.dll
@@ -26,6 +27,7 @@ D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.IdentityMode
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.IdentityModel.Tokens.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.OpenApi.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Microsoft.SqlServer.Server.dll
+D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Newtonsoft.Json.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Swashbuckle.AspNetCore.Swagger.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -52,4 +54,5 @@ D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\runtimes\win\lib\net9.
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
+D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\sha-SEN26Rs.xml
 D:\sha-SEN26Rs\sha-SEN26Rs\obj\Release\net10.0\PubTmp\Out\sha-SEN26Rs.deps.json

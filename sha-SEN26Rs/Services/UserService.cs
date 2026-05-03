@@ -8,6 +8,7 @@ namespace sha_SEN26Rs.Services;
 public interface IStudentService
 {
     Task<List<StudentResponseDto>> GetAllAsync();
+    Task<List<StudentResponseDto>> SearchAsync(string query);
     Task<StudentResponseDto> GetByUsernameAsync(string username);
     Task<StudentResponseDto> GetByIdAsync(Guid id);
     Task<StudentResponseDto> UpdateAsync(Guid studentId, UpdateStudentDto dto);
@@ -27,6 +28,15 @@ public class StudentService(
     public async Task<List<StudentResponseDto>> GetAllAsync()
     {
         var students = await studentRepo.GetAllAsync();
+        return students.Select(AuthService.MapToDto).ToList();
+    }
+
+    public async Task<List<StudentResponseDto>> SearchAsync(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            throw new InvalidOperationException("Search query cannot be empty.");
+
+        var students = await studentRepo.SearchAsync(query);
         return students.Select(AuthService.MapToDto).ToList();
     }
 

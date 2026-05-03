@@ -33,6 +33,38 @@ public class StudentRepository(AppDbContext context) : IStudentRepository
             .OrderBy(s => s.FullName)
             .ToListAsync();
 
+    public async Task<List<Student>> SearchAsync(string query)
+    {
+        var q = query.Trim();
+        if (q.Length == 0) return [];
+
+        var escaped = q.Replace("[", "[[]").Replace("%", "[%]").Replace("_", "[_]");
+        var pattern = $"%{escaped}%";
+
+        int? teamNumber = int.TryParse(q, out var tn) ? tn : null;
+
+        return await context.Students
+            .Include(s => s.Team)
+            .Include(s => s.StudentSpecialties).ThenInclude(ss => ss.Specialty)
+            .Include(s => s.SocialLinks)
+            .Include(s => s.Images)
+            .Where(s =>
+                EF.Functions.Like(s.Username, pattern) ||
+                EF.Functions.Like(s.FullName, pattern) ||
+                (s.Nickname != null && EF.Functions.Like(s.Nickname, pattern)) ||
+                (s.Bio != null && EF.Functions.Like(s.Bio, pattern)) ||
+                (s.Location != null && EF.Functions.Like(s.Location, pattern)) ||
+                (s.Phone != null && EF.Functions.Like(s.Phone, pattern)) ||
+                (s.Website != null && EF.Functions.Like(s.Website, pattern)) ||
+                (s.GraduationProjectSpecialty != null && EF.Functions.Like(s.GraduationProjectSpecialty, pattern)) ||
+                (s.Team != null && EF.Functions.Like(s.Team.Name, pattern)) ||
+                (s.Team != null && s.Team.ProjectName != null && EF.Functions.Like(s.Team.ProjectName, pattern)) ||
+                s.StudentSpecialties.Any(ss => EF.Functions.Like(ss.Specialty.Name, pattern)) ||
+                (teamNumber != null && s.Team != null && s.Team.TeamNumber == teamNumber))
+            .OrderBy(s => s.FullName)
+            .ToListAsync();
+    }
+
     public async Task<Student> CreateAsync(Student student)
     {
         student.Id = Guid.NewGuid();

@@ -22,6 +22,30 @@ public class StudentsController(IStudentService studentService, IUserImageServic
     public async Task<IActionResult> GetAll() =>
         Ok(await studentService.GetAllAsync());
 
+    /// <summary>Search students by any profile field.</summary>
+    /// <remarks>
+    /// Example: `GET /api/students/search?q=belal`
+    ///
+    /// Matches (case-insensitive, partial): `fullName`, `username`, `nickname`, `bio`,
+    /// `location`, `phone`, `website`, `graduationProjectSpecialty`, `team.name`,
+    /// `team.projectName`, and specialty names.
+    /// If `q` is a number, it also matches `team.teamNumber` (exact).
+    ///
+    /// Returns an empty array `[]` when nothing matches — show a
+    /// "No users found" message in the UI.
+    /// </remarks>
+    /// <param name="q">Search text (required, not empty).</param>
+    /// <response code="200">Matching students (can be empty).</response>
+    /// <response code="400">`q` is missing or empty.</response>
+    [HttpGet("search")]
+    [ProducesResponseType(typeof(List<StudentResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Search([FromQuery] string q)
+    {
+        try { return Ok(await studentService.SearchAsync(q)); }
+        catch (InvalidOperationException ex) { return BadRequest(new { message = ex.Message }); }
+    }
+
     /// <summary>Get the logged-in user's profile.</summary>
     /// <remarks>Check `isOnboarded` to decide: onboarding page vs home.</remarks>
     /// <response code="200">My profile.</response>

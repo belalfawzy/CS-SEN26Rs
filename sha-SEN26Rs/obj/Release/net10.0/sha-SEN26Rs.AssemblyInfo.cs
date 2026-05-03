@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("sha-SEN26Rs")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+096d2c08194a413a95d89bc8f8ec38cec9dd0593")]
 [assembly: System.Reflection.AssemblyProductAttribute("sha-SEN26Rs")]
 [assembly: System.Reflection.AssemblyTitleAttribute("sha-SEN26Rs")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
